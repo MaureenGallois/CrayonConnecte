@@ -26,7 +26,7 @@ void setup() {
   // join I2C bus (I2Cdev library doesn't do this automatically)
   Wire.begin();
   // COMMENT NEXT LINE IF YOU ARE USING ARDUINO DUE
-  //TWBR = 24; // 400kHz I2C clock (200kHz if CPU is 8MHz). Leonardo measured 250kHz.
+  TWBR = 24; // 400kHz I2C clock (200kHz if CPU is 8MHz). Leonardo measured 250kHz.
   
   // initialize serial communication
   Serial.begin(115200);
@@ -37,14 +37,10 @@ void setup() {
   // initialize pressure
   pinMode(A0, INPUT);
 
-  // initialize LED
-  pinMode(4, LOW);
-
   while (Serial.available() && Serial.read()); // empty buffer again
 
   // start message
-  delay(2000);
-  delay(3000);
+  delay(1000);
   // verify connection
   Serial.println(accelgyro.testConnection() ? "MPU6050 connection successful" : "MPU6050 connection failed");
   delay(1000);
@@ -62,26 +58,23 @@ void loop() {
   if (state==0){
     meansensors();
     state++;
-    delay(1000);
   }
 
   if (state==1) {
     calibration();
     state++;
-    delay(1000);
     Serial.println("Calibrage terminé");
   }
   
-  int pressure = analogRead(A0);
-  if(pressure >= 700){
+  //int pressure = analogRead(A0);
+  //if(pressure >= 700){
+  if (state==2) {
     meansensors();
-    pinMode(4, HIGH);
     Serial.print(mean_ax);
     Serial.print(";");
     Serial.println(mean_ay);
-  } else {
-    pinMode(4, LOW);
   }
+  //}
 }
 
 ///////////////////////////////////   FUNCTIONS   ////////////////////////////////////
@@ -109,7 +102,7 @@ void meansensors(){
       mean_gz=buff_gz/buffersize;
     }
     i++;
-    delay(1); //Needed so we don't get repeated measures
+    delay(0.2); //Needed so we don't get repeated measures
   }
 }
 
